@@ -33,6 +33,8 @@ public interface CoinPriceRepo extends ReactiveMongoRepository<CoinPrice, CoinPr
     })
     Mono<CoinPrice> getCoinPriceByDateTimeAndSymbol(String localDateTimeString, String symbol);
 
+
+
     @Aggregation(pipeline = {
             "{ '$match': {  '_id.datetime' : { $eq : ?0 }   } }",
     })
