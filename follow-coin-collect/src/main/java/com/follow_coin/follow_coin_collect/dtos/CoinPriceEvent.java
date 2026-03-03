@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CoinPriceEvent extends EventWrapper {
+public class CoinPriceEvent extends EventWrapper  {
 
     private CoinPrice coinPrice;
 }

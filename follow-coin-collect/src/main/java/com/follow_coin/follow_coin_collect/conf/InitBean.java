@@ -11,7 +11,7 @@ public class InitBean implements InitializingBean {
 
     @Autowired
     private RegisterService registerService;
-
+    //TODO create time series collection
     @Override
     public void afterPropertiesSet() {
         registerStartCoins();
@@ -20,10 +20,15 @@ public class InitBean implements InitializingBean {
     private void registerStartCoins()  {
         registerService.count().subscribe( x -> {
             if (x == 0 ){
-                registerService.registerCoin("BTC").subscribe();
-                registerService.registerCoin("ADA").subscribe();
-                registerService.registerCoin("DOGE").subscribe();
-                registerService.registerCoin("ETH").subscribe();
+                try {
+                    registerService.registerCoin("BTC").subscribe();
+                    registerService.registerCoin("ADA").subscribe();
+                    registerService.registerCoin("DOGE").subscribe();
+                    registerService.registerCoin("ETH").subscribe();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
             }
         });
 
