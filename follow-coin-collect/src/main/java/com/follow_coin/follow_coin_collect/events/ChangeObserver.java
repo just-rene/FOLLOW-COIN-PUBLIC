@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.follow_coin.follow_coin_collect.dtos.CoinPriceEvent;
 import com.follow_coin.follow_coin_collect.entities.CoinPrice;
+import com.follow_coin.follow_coin_collect.types.EventTypes;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ChangeStreamEvent;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.events.Event;
 
 import java.util.Objects;
 
@@ -55,7 +57,7 @@ public class ChangeObserver {
             logger.error("could not deserialize value!");
         }
         logger.info(data);
-        sqsTemplate.sendAsync("coin-price-event", data);
+        sqsTemplate.sendAsync(EventTypes.COIN_PRICE_EVENT.value, data);
     }
 
 }
