@@ -46,13 +46,17 @@ public class EventController {
         System.err.println("new client subscription to ticker-stream");
        return reactiveMongoTemplate.changeStream("coinPriceDifferenceEvent", ChangeStreamOptions.empty(), CoinPriceDifferenceEvent.class)
                 .map(x-> {
+
+                    System.err.println(x.getOperationType().getValue());
+                    System.err.println(x.getBody().get_id().getSymbol());
+                    System.err.println(x.getBody().getDifferenceAbsolute());
+
                         if(x.getOperationType().getValue().equals("insert")){
                             return x.getBody();
                         }else {
                             return Flux.empty();
                         }
                 });
-
     }
 
 

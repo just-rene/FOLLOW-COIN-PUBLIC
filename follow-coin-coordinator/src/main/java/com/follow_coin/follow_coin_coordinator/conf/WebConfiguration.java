@@ -11,14 +11,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
-
     @Value("${cors.pattern}")
     String cors;
 
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        System.err.println(cors);
+        System.err.println("Be careful with cors in actual production: { } " + cors);
+        //TODO remove in actual production
         registry.addMapping("/**").allowedOriginPatterns(cors);
     }
 }

@@ -4,7 +4,6 @@ package com.follow_coin.follow_coin_collect.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.follow_coin.follow_coin_collect.events.ChangeObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class CleanMapper {
      * @return JsonNode or null
      */
 
-    public JsonNode readTree(String inputData){
+    public JsonNode readTree(String inputData) {
         JsonNode data = null;
         try {
             data = objectMapper.readTree(inputData);

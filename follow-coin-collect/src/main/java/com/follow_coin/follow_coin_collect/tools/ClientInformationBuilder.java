@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
+@Deprecated
 @AllArgsConstructor
 //@Autowired
 public class ClientInformationBuilder{

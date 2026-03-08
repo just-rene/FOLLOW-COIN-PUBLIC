@@ -2,19 +2,32 @@ package com.follow_coin.follow_coin_compute.events.observer;
 
 import com.follow_coin.follow_coin_compute.EventTypes;
 import com.follow_coin.follow_coin_compute.computation.CoinPriceAlgorithm;
+import com.follow_coin.follow_coin_compute.computation.CoinPriceAlgorithmType;
+import com.follow_coin.follow_coin_compute.computation.ComputationFactory;
 import com.follow_coin.follow_coin_compute.computation.dtos.CoinPriceDifferenceResult;
+import com.follow_coin.follow_coin_compute.computation.dtos.CoinPricePair;
 import com.follow_coin.follow_coin_compute.computation.dtos.ComputationResult;
 import com.follow_coin.follow_coin_compute.dtos.CoinPriceData;
+import com.follow_coin.follow_coin_compute.dtos.CoinPriceDifferenceEvent;
+import com.follow_coin.follow_coin_compute.dtos.CoinPriceEvent;
+import com.follow_coin.follow_coin_compute.entities.Coin;
 import com.follow_coin.follow_coin_compute.entities.CoinPrice;
+import com.follow_coin.follow_coin_compute.events.visitor.ComputationVisitor;
+import com.follow_coin.follow_coin_compute.repos.CoinPriceRepo;
 import com.follow_coin.follow_coin_compute.tools.CleanMapper;
+import com.follow_coin.follow_coin_compute.tools.DateTimeTool;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ChangeStreamEvent;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +41,14 @@ public class CoinPriceChangeObserver implements ChangeObserver {
     @Autowired
     private SqsTemplate sqsTemplate;
 
-    private final List<CoinPriceAlgorithm> coinPriceAlgorithms;
+    @Autowired
+    private CoinPriceRepo coinPriceRepo;
+
+    @Autowired
+    private DateTimeTool dateTimeTool;
+
+    @Autowired
+    private ComputationVisitor computationVisitor;
 
     private static final Logger logger = LoggerFactory.getLogger(CoinPriceChangeObserver.class);
 
@@ -36,9 +56,11 @@ public class CoinPriceChangeObserver implements ChangeObserver {
 
     private final ReactiveMongoTemplate reactiveMongoTemplate;
 
+    @Autowired
+    private ComputationFactory computationFactory;
+
     public CoinPriceChangeObserver(ReactiveMongoTemplate reactiveMongoTemplate, List<CoinPriceAlgorithm> coinPriceAlgorithms) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
-        this.coinPriceAlgorithms = coinPriceAlgorithms;
         watchForChanges();
     }
 
@@ -54,26 +76,21 @@ public class CoinPriceChangeObserver implements ChangeObserver {
     }
 
     @Override
-    public void doOnChange(ChangeStreamEvent<CoinPrice> event) {
-        coinPriceAlgorithms.stream()
-                .map(x -> x.compute(new CoinPriceData(event.getBody())))
-                .map(this::castToType)
-                .forEach(this::send);
+    public void doOnChange(ChangeStreamEvent<CoinPrice> event)  {
+        var currentCoinPrice = Objects.requireNonNull(event.getBody());
+        accept(computationVisitor, currentCoinPrice);
     }
 
-    private String castToType(ComputationResult computationResult) {
-        if (computationResult instanceof CoinPriceDifferenceResult coinPriceDifferenceResult) {
-            return mapper.writeValueAsString(coinPriceDifferenceResult.getCoinPriceDifferenceEvent());
-        } else {
-            logger.error("tried to cast to unknown type");
-            return "";
-        }
+    @Override
+    public void accept(ComputationVisitor computationVisitor, CoinPrice currentCoinPrice) {
+        computationVisitor.visit(currentCoinPrice)
+                .subscribe(this::send);
     }
 
     private void send(String data) {
+        logger.info("send sqs: {}", data);
+
         sqsTemplate.sendAsync(EventTypes.COIN_PRICE_DIFFERENCE_EVENT.value, data);
     }
-
-
 }
 

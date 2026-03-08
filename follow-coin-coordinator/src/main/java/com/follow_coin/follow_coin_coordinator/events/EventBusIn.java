@@ -29,12 +29,9 @@ public class EventBusIn {
     @SqsListener(value = "coin-price-difference-events")
     public void listen(String message) throws JsonProcessingException {
 
-        System.err.println(message);
         CoinPriceDifferenceEvent currentCoinPriceEvent = mapper.readValue(message, CoinPriceDifferenceEvent.class);
 
-
         coinPriceDifferenceEventRepo.save(currentCoinPriceEvent).subscribe();
-
     }
 }
 

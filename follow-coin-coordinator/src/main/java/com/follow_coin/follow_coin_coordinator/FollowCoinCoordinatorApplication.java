@@ -9,5 +9,4 @@ public class FollowCoinCoordinatorApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FollowCoinCoordinatorApplication.class, args);
 	}
-
 }

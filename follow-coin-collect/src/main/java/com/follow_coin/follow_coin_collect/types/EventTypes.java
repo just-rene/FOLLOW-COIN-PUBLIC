@@ -7,6 +7,5 @@ public enum EventTypes {
     public final String value;
     EventTypes(String value) {
         this.value = value;
-
     }
 }

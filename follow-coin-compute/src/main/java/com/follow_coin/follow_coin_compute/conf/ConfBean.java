@@ -12,10 +12,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class ConfBean {
 
-    @Bean
-    public WebClient.Builder lbWebClient() {
-        return WebClient.builder();
-    }
+//    @Bean
+//    public WebClient.Builder lbWebClient() {
+//        return WebClient.builder();
+//    }
 
 
 }

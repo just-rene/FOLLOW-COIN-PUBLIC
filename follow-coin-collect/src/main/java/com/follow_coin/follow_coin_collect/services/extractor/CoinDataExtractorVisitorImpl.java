@@ -41,7 +41,6 @@ public class CoinDataExtractorVisitorImpl implements CoinDataExtractorVisitor {
     }
 
     private List<CoinPrice> extractRelevantCoinData(JsonNode data, List<String> requiredCoinSymbols) {
-
         return StreamSupport
                 .stream(data.findPath(ExtractFields.DATA.val).spliterator(), false)
                 .filter(jsonNode -> requiredCoinSymbols.contains(jsonNode.get(ExtractFields.SYMBOL.val).asText()))
@@ -51,5 +50,4 @@ public class CoinDataExtractorVisitorImpl implements CoinDataExtractorVisitor {
                     return new CoinPrice(new CoinPriceKey(jsonNode.get(ExtractFields.SYMBOL.val).asText(), date), price);
                 }).toList();
     }
-
 }

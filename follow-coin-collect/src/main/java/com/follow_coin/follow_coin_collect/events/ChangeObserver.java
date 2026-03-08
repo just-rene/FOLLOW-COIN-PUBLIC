@@ -12,13 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ChangeStreamEvent;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.events.Event;
 
 import java.util.Objects;
 
 @Service
 public class ChangeObserver {
-
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -43,12 +41,11 @@ public class ChangeObserver {
                 .listen()
                 .filter(e -> Objects.requireNonNull(e.getOperationType()).getValue().equals("insert"))
                 .doOnNext(this::accept)
-                .doOnError(error -> System.err.println("Error in change stream: " + error.getMessage()))
+                .doOnError(error -> logger.error("Error in change stream: {}", error.getMessage()))
                 .subscribe();
     }
 
     private void accept(ChangeStreamEvent<CoinPrice> event) {
-        System.err.println("change event");
         String data = "";
         try {
             CoinPriceEvent coinPriceEvent = new CoinPriceEvent(event.getBody());

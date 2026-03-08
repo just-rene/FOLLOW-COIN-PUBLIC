@@ -14,4 +14,9 @@ public class DateTimeTool {
         String datetimeString = c.getCoinPriceKey().getDatetime();
         return LocalDateTime.parse(datetimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
     }
+
+    public String getDateTimeBefore(LocalDateTime dateTimeCurrent){
+        LocalDateTime dateTimeBefore = dateTimeCurrent.minusMinutes(1);
+        return dateTimeBefore.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+    }
 }

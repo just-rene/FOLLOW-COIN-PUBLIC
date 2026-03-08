@@ -4,6 +4,7 @@ package com.follow_coin.follow_coin_collect.rest;
 import com.follow_coin.follow_coin_collect.dtos.CoinDto;
 import com.follow_coin.follow_coin_collect.entities.Coin;
 import com.follow_coin.follow_coin_collect.entities.CoinPrice;
+import com.follow_coin.follow_coin_collect.entities.CoinPriceKey;
 import com.follow_coin.follow_coin_collect.repos.CoinPriceRepo;
 import com.follow_coin.follow_coin_collect.services.CollectService;
 import com.follow_coin.follow_coin_collect.services.RegisterService;
@@ -53,16 +54,17 @@ public class CoinInfoController {
                         Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body((CoinDto)new CoinDto(new Coin()).setInfo(x.getMessage()))));
     }
 
-
     @GetMapping("/coin-prices/{startDate}/{endDate}")
-    public Flux<CoinPrice> getCoinPrices(@PathVariable String startDate, @PathVariable String endDate) {
-        return coinPriceRepo.getCoinPricesBetween(startDate, endDate);
+    public Flux<ResponseEntity<CoinPrice>> getCoinPrices(@PathVariable String startDate, @PathVariable String endDate) {
+        return coinPriceRepo.getCoinPricesBetween(startDate, endDate)
+                .map( coinPrice -> ResponseEntity.status(HttpStatus.OK).body(coinPrice))
+                .onErrorResume( x-> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CoinPrice())));
     }
 
     @GetMapping("/coin-prices/{date}")
-    public Flux<CoinPrice> getCoinPrices(@PathVariable String date) {
-        return coinPriceRepo.getCoinPricesForDate(date);
+    public Flux<ResponseEntity<CoinPrice>> getCoinPrices(@PathVariable String date) {
+        return coinPriceRepo.getCoinPricesForDate(date)
+                .map( coinPrice -> ResponseEntity.status(HttpStatus.OK).body(coinPrice))
+                .onErrorResume( x-> Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CoinPrice())));
     }
-
-
 }

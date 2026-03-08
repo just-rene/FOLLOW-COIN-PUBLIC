@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Objects;
 
+
+//TODO: implement
 @Component
 public class ComputationFactory {
 
@@ -17,7 +19,7 @@ public class ComputationFactory {
 
 
     public CoinPriceAlgorithm create(CoinPriceAlgorithmType type) throws Exception {
-        if(Objects.equals(CoinPriceAlgorithmType.COIN_PRICE_DIFFERENCE_ALGORITHM.value, type.value)){
+        if(Objects.equals(CoinPriceAlgorithmType.COIN_PRICE_DIFFERENCE_ALGORITHM, type)){
             return find(CoinPriceDifferenceAlgorithm.class);
         }
         throw new Exception("unknown algorithm type.");

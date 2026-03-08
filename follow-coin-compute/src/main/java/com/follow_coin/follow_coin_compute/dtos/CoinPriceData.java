@@ -1,6 +1,7 @@
 package com.follow_coin.follow_coin_compute.dtos;
 
 
+import com.follow_coin.follow_coin_compute.computation.dtos.CoinPricePair;
 import com.follow_coin.follow_coin_compute.entities.CoinPrice;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,12 @@ public class CoinPriceData {
         this.coinPrices = coinPrices;
     }
 
+    public CoinPriceData(CoinPricePair coinPricePair){
+        this.coinPricePair = coinPricePair;
+    }
+
     CoinPrice coinPrice;
+    CoinPricePair coinPricePair;
     List<CoinPrice> coinPrices;
 
 }

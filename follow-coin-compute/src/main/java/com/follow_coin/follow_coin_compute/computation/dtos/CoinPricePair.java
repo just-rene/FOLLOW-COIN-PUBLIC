@@ -11,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CoinPricePair {
+
     CoinPrice coinPriceCurrent;
     CoinPrice coinPriceBefore;
 }

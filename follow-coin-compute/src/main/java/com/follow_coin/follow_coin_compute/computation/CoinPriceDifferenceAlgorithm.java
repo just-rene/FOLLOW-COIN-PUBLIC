@@ -7,19 +7,14 @@ import com.follow_coin.follow_coin_compute.dtos.CoinPriceData;
 import com.follow_coin.follow_coin_compute.dtos.CoinPriceDifferenceEvent;
 import com.follow_coin.follow_coin_compute.dtos.CoinPriceDifferenceEventKey;
 import com.follow_coin.follow_coin_compute.entities.CoinPrice;
-import com.follow_coin.follow_coin_compute.entities.CoinPriceKey;
 import com.follow_coin.follow_coin_compute.repos.CoinPriceRepo;
 import com.follow_coin.follow_coin_compute.tools.DateTimeTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @Component
 //@Scope("prototype")
 public class CoinPriceDifferenceAlgorithm implements CoinPriceAlgorithm {
-
 
     @Autowired
     private DateTimeTool dateTimeTool;
@@ -27,14 +22,12 @@ public class CoinPriceDifferenceAlgorithm implements CoinPriceAlgorithm {
     @Autowired
     private CoinPriceRepo coinPriceRepo;
 
-
     @Override
     public ComputationResult compute(CoinPriceData coinPriceData) {
-        System.err.println("CoinPriceDifferenceAlgorithm");
-        CoinPricePair coinPricePair = prepare(coinPriceData.getCoinPrice());
+        CoinPricePair coinPricePair = coinPriceData.getCoinPricePair();
 
         CoinPrice coinPriceCurrent = coinPricePair.getCoinPriceCurrent();
-        CoinPrice coinPriceBefore = coinPriceRepo.getCoinPriceByDateTimeAndSymbol(coinPricePair.getCoinPriceBefore().getCoinPriceKey().getDatetime(), coinPricePair.getCoinPriceBefore().getCoinPriceKey().getSymbol()).block();
+        CoinPrice coinPriceBefore = coinPricePair.getCoinPriceBefore();
 
         if (coinPriceBefore != null && coinPriceCurrent != null) {
 
@@ -52,24 +45,10 @@ public class CoinPriceDifferenceAlgorithm implements CoinPriceAlgorithm {
             return new CoinPriceDifferenceResult(new CoinPriceDifferenceEvent(coinPriceDifferenceEventKey, priceDifference, isOneOfTheEntitiesInterpolated));
         }
 
-        return null;
+        return new CoinPriceDifferenceResult(new CoinPriceDifferenceEvent());
     }
 
-    private CoinPricePair prepare(CoinPrice coinPrice) {
-        //extract and get event one minute before
-        LocalDateTime localDateTimeCurrentEvent = dateTimeTool.extractDateTime(coinPrice);
-        System.err.println("current coin price event: " + localDateTimeCurrentEvent.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")));
-
-        LocalDateTime localDateTimeLastEvent = localDateTimeCurrentEvent.minusMinutes(1);
-        String localDateTimeLastEventString = localDateTimeLastEvent.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
-        String symbol = coinPrice.getCoinPriceKey().getSymbol();
-
-        CoinPriceKey coinPriceKeyBefore = new CoinPriceKey(symbol, localDateTimeLastEventString);
-        CoinPrice coinPriceBefore = new CoinPrice(coinPriceKeyBefore, -1, false);
-
-        return new CoinPricePair(coinPrice, coinPriceBefore);
-    }
-
+    //TODO: reimplement
 //    private Mono<CoinPrice> interpolateWithLatestValue(LocalDateTime localDateTimeCurrentEvent, CoinPrice cpep) {
 //
 //        Mono<CoinPrice> latestCoinPriceEventBefore = coinPriceRepo
